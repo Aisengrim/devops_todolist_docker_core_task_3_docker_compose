@@ -1,13 +1,86 @@
-### Create docker-compose.yml
+# Project Configuration
 
-### Change line 69 "HOST" value in todolist/settings.py: "{ip}" >> "mysql"
+## Before running the containers, make the following changes.
 
-### Delete "RUN python manage.py migrate" in Dockerfile;
+### 1. Update database host
 
-### Change on "ENTRYPOINT ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]" in Dockerfile;Expand commentComment on lines R1 to R4Resolved
+## Open the file:
 
-### Run command docker-compose up -d
+```
+todolist/settings.py
+```
 
-### Go to localhost:8080 in your browser
+## Find the `HOST` parameter in the database configuration and change:
 
-### Run command docker-compose down
+```
+"{ip}"
+```
+
+to:
+
+```
+"mysql"
+```
+
+## This allows the application container to connect to the MySQL container using Docker's internal network.
+
+
+---
+
+
+### 2. Update Dockerfile
+
+## Remove the following line because the database is not available during the build stage:
+
+```
+RUN python manage.py migrate
+```
+
+## Update the `ENTRYPOINT` instruction to run database migrations and start the application:
+
+```
+ENTRYPOINT ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]
+```
+
+
+---
+
+
+# Running the Application
+
+## Build and start the containers:
+
+```bash
+docker compose up -d
+```
+
+## This command will:
+
+* Build the application image
+* Start the MySQL database container
+* Run database migrations
+* Start the Django application
+
+
+---
+
+
+# Access the Application
+
+## Open your browser and go to:
+
+```
+http://localhost:8080
+```
+
+
+
+
+
+# Stopping the Application
+
+## To stop and remove the running containers:
+
+```bash
+docker compose down
+```
